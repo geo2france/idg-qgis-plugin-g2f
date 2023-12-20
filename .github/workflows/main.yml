@@ -1,0 +1,31 @@
+on: push
+
+jobs: 
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Clear destination directory
+        run: rm -rf ./uncompressed/*
+        
+      - name: Extract files from QGZ
+        run: 7z x geo2france.qgz -o./uncompressed
+
+      - name: Display content of uncompressed directory
+        run: ls -R ./uncompressed
+        
+      - name: Configure Git
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Action"
+  
+      - name: Check for changes
+        run: git add ./uncompressed/ 
+
+      - name: Commit
+        run: git commit -m "Decompress QGZ" || echo "No changes to commit"
+  
+      - name: Push changes
+        run: git push
